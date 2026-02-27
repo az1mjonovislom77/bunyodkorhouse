@@ -1,0 +1,28 @@
+from modeltranslation.translator import register, TranslationOptions
+
+from .models import HomePage, AdvertisementBanner, Reviews, AboutCompany, Location
+
+
+@register(HomePage)
+class HomePageTranslation(TranslationOptions):
+    fields = ('title', 'description')
+
+
+@register(AdvertisementBanner)
+class AdvertisementBannerTranslation(TranslationOptions):
+    fields = ('title', 'description')
+
+
+@register(Reviews)
+class ReviewsTranslation(TranslationOptions):
+    fields = ('text',)
+
+
+@register(AboutCompany)
+class AboutCompanyTranslation(TranslationOptions):
+    fields = ('description',)
+
+
+@register(Location)
+class LocationTranslation(TranslationOptions):
+    fields = ('address', 'description')

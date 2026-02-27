@@ -1,0 +1,131 @@
+import json
+from decimal import Decimal, InvalidOperation
+from home.models import Home
+
+
+def import_homes_from_json(json_path):
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    if isinstance(data, dict):
+        data = [data]
+
+    model_fields = {field.name for field in Home._meta.get_fields()}
+    created_count = 0
+
+    for item in data:
+        item.pop('id', None)
+        item.pop('commonhouse', None)
+
+        if 'pricePerArea' in item:
+            price_str = str(item.pop('pricePerArea')).replace(',', '').strip()
+            try:
+                item['pricePerSqm'] = Decimal(price_str)
+            except InvalidOperation:
+                item['pricePerSqm'] = None
+        elif 'pricePerSqm' in item:
+            price_str = str(item['pricePerSqm']).replace(',', '').strip()
+            try:
+                item['pricePerSqm'] = Decimal(price_str)
+            except InvalidOperation:
+                item['pricePerSqm'] = None
+
+        # --- area ---
+        if 'area' in item:
+            area_str = str(item['area']).replace(',', '').strip()
+            try:
+                item['area'] = Decimal(area_str)
+            except InvalidOperation:
+                item['area'] = None
+
+        # --- default multilingual fields ---
+        descriptions = {
+            'description_uz': "Yorug‘, ekologik hududda joylashgan yaxshi rejalashtirilgan kvartira",
+            'description_en': "Bright apartment with a good layout in an eco-friendly area",
+            'description_ru': "Светлая квартира с хорошей планировкой в экологичном районе",
+            'description_zh_hans': "明亮的公寓，布局合理，位于环保区域",
+            'description_ar': "شقة مشرقة ذات تخطيط جيد في منطقة صديقة للبيئة",
+        }
+
+        regions = {
+            'region_uz': "Qarshi",
+            'region_en': "Qarshi",
+            'region_ru': "Карши",
+            'region_zh_hans': "卡尔希",
+            'region_ar': "قارشي",
+        }
+
+        types = {
+            'type_uz': "Kvartira",
+            'type_en': "Apartment",
+            'type_ru': "Квартира",
+            'type_zh_hans': "公寓",
+            'type_ar': "شقة",
+        }
+
+        qualities = {
+            'qualities_uz': [
+                "24/7 Xavfsizlik",
+                "Avtoturargoh",
+                "Bolalar maydonchasi",
+                "Lift",
+                "Balkon",
+                "Bog‘"
+            ],
+            'qualities_en': [
+                "24/7 Security",
+                "Parking",
+                "Playground",
+                "Elevator",
+                "Balcony",
+                "Garden"
+            ],
+            'qualities_ru': [
+                "24/7 Охрана",
+                "Парковка",
+                "Детская площадка",
+                "Лифт",
+                "Балкон",
+                "Сад"
+            ],
+            'qualities_zh_hans': [
+                "24/7 安全",
+                "停车场",
+                "儿童游乐场",
+                "电梯",
+                "阳台",
+                "花园"
+            ],
+            'qualities_ar': [
+                "أمن على مدار الساعة",
+                "موقف سيارات",
+                "ملعب أطفال",
+                "مصعد",
+                "شرفة",
+                "حديقة"
+            ]
+        }
+
+        names = {
+            'name_uz': "FAYZLI XONADONLAR KITOB",
+            'name_en': "FAYZLI XONADONLAR KITOB",
+            'name_ru': "FAYZLI XONADONLAR KITOB",
+            'name_zh_hans': "FAYZLI XONADONLAR KITOB",
+            'name_ar': "FAYZLI XONADONLAR KITOB",
+        }
+
+        item['buildingBlock'] = "1"
+        item['status'] = "SALE"
+
+        item.update(descriptions)
+        item.update(regions)
+        item.update(types)
+        item.update(qualities)
+        item.update(names)
+
+        filtered = {k: v for k, v in item.items() if k in model_fields}
+
+        Home.objects.create(**filtered)
+        created_count += 1
+
+    print(f"✅ {created_count} ta uy muvaffaqiyatli saqlandi (name=FAYZLI XONADONLAR, block=1, status=SALE).")

@@ -113,21 +113,21 @@ class Home(models.Model):
         from .models import Basement
         from decimal import Decimal
 
-        creating = self.pk is None
-
         if self.area and self.pricePerSqm:
             self.price = Decimal(self.area) * Decimal(self.pricePerSqm)
 
         super().save(*args, **kwargs)
 
-        if not creating:
-            basements = Basement.objects.filter(home=self)
+        if self.pk:
+            basements = Basement.objects.filter(home_id=self.pk)
 
             if basements.exists():
                 basement_total_price = sum(b.price or Decimal(0) for b in basements)
                 basement_total_area = sum(b.area or Decimal(0) for b in basements)
+
                 home_price = self.price or Decimal(0)
                 home_area = self.area or Decimal(0)
+
                 self.totalprice = home_price + basement_total_price
                 self.totalarea = home_area + basement_total_area
             else:

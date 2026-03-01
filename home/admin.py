@@ -79,13 +79,14 @@ class InProgressAdmin(TranslationAdmin):
     list_display = ('id', 'title', 'progress', 'stage')
     inlines = [InProgressImageInline, ]
 
-
 @admin.register(Home)
 class HomeAdmin(TranslationAdmin):
-    list_display = ('id', 'name', 'area', 'price', 'totalarea', 'totalprice', 'buildingBlock', 'home_number', 'status', 'is_active')
+    list_display = ('id', 'name', 'area', 'price', 'totalarea', 'totalprice',
+                    'buildingBlock', 'home_number', 'status', 'is_active')
     list_filter = ('region', 'floor', 'buildingBlock', 'status')
     search_fields = ('name', 'region', 'description', 'floor', 'buildingBlock')
-    inlines = [HomeImageInline, FloorPlanInline, MasterPlanInline, InteriorPhotosInline, DownPaymentInline]
+    inlines = [HomeImageInline, FloorPlanInline, MasterPlanInline,
+               InteriorPhotosInline, DownPaymentInline]
 
     def save_model(self, request, obj, form, change):
         from .models import Basement
@@ -93,7 +94,9 @@ class HomeAdmin(TranslationAdmin):
         if obj.area and obj.pricePerSqm:
             obj.price = Decimal(obj.area) * Decimal(obj.pricePerSqm)
 
-        basements = Basement.objects.filter(home=obj)
+        super().save_model(request, obj, form, change)
+
+        basements = Basement.objects.filter(home_id=obj.pk)
 
         if basements.exists():
             basement_total_price = sum(b.price or Decimal(0) for b in basements)
@@ -108,7 +111,7 @@ class HomeAdmin(TranslationAdmin):
             obj.totalprice = Decimal(0)
             obj.totalarea = Decimal(0)
 
-        super().save_model(request, obj, form, change)
+        obj.save(update_fields=["totalprice", "totalarea"])
 
 
 @admin.register(Basement)

@@ -17,7 +17,7 @@ class CommonHouse(models.Model):
     longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.title)
+        return self.title or f"CommonHouse {self.pk}"
 
 
 class CommonHouseAdvImage(models.Model):
@@ -35,7 +35,9 @@ class CommonHouseAdvImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.commonhouse.title)
+        if self.commonhouse and self.commonhouse.title:
+            return self.commonhouse.title
+        return f"CommonHouseImage {self.pk}"
 
 
 class CommonHouseMainImage(models.Model):
@@ -53,7 +55,9 @@ class CommonHouseMainImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.commonhouse.title)
+        if self.commonhouse and self.commonhouse.title:
+            return self.commonhouse.title
+        return f"CommonHouseImage {self.pk}"
 
 
 class CommonHouseAbout(models.Model):
@@ -65,7 +69,9 @@ class CommonHouseAbout(models.Model):
     projectarea = models.DecimalField(max_digits=100, decimal_places=2, default=0)
 
     def __str__(self):
-        return str(self.commonhouse.title)
+        if self.commonhouse and self.commonhouse.title:
+            return self.commonhouse.title
+        return f"CommonHouseAbout {self.pk}"
 
 
 class CommonHouseAboutImage(models.Model):
@@ -83,7 +89,9 @@ class CommonHouseAboutImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.commonhouseabout.blocks)
+        if self.commonhouseabout:
+            return f"AboutImage {self.pk}"
+        return f"CommonHouseAboutImage {self.pk}"
 
 
 class Home(models.Model):
@@ -113,28 +121,30 @@ class Home(models.Model):
         from .models import Basement
         from decimal import Decimal
 
-        creating = self.pk is None
-
         if self.area and self.pricePerSqm:
             self.price = Decimal(self.area) * Decimal(self.pricePerSqm)
 
         super().save(*args, **kwargs)
 
-        if not creating:
-            basements = Basement.objects.filter(home=self)
+        if not self.pk:
+            return
 
-            if basements.exists():
-                basement_total_price = sum(b.price or Decimal(0) for b in basements)
-                basement_total_area = sum(b.area or Decimal(0) for b in basements)
-                home_price = self.price or Decimal(0)
-                home_area = self.area or Decimal(0)
-                self.totalprice = home_price + basement_total_price
-                self.totalarea = home_area + basement_total_area
-            else:
-                self.totalprice = Decimal(0)
-                self.totalarea = Decimal(0)
+        basements = Basement.objects.filter(home_id=self.pk)
 
-            super().save(update_fields=['totalprice', 'totalarea'])
+        if basements.exists():
+            basement_total_price = sum(b.price or Decimal(0) for b in basements)
+            basement_total_area = sum(b.area or Decimal(0) for b in basements)
+
+            home_price = self.price or Decimal(0)
+            home_area = self.area or Decimal(0)
+
+            self.totalprice = home_price + basement_total_price
+            self.totalarea = home_area + basement_total_area
+        else:
+            self.totalprice = Decimal(0)
+            self.totalarea = Decimal(0)
+
+        super().save(update_fields=["totalprice", "totalarea"])
 
     def __str__(self):
         return str(self.id)
@@ -147,7 +157,7 @@ class DownPayment(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=100, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.percent}{self.price}{self.description}'
+        return f"DownPayment {self.pk}"
 
 
 class HomeImage(models.Model):
@@ -165,7 +175,9 @@ class HomeImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.home.name
+        if self.home and self.home.name:
+            return self.home.name
+        return f"{self.__class__.__name__} {self.pk}"
 
     class Meta:
         db_table = 'homeimage'
@@ -188,7 +200,9 @@ class FloorPlan(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.home.name
+        if self.home and self.home.name:
+            return self.home.name
+        return f"{self.__class__.__name__} {self.pk}"
 
     class Meta:
         db_table = 'floorplanimage'
@@ -211,7 +225,9 @@ class MasterPlan(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.home.name
+        if self.home and self.home.name:
+            return self.home.name
+        return f"{self.__class__.__name__} {self.pk}"
 
     class Meta:
         db_table = 'masterplanimages'
@@ -234,7 +250,9 @@ class InteriorPhotos(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.home.name
+        if self.home and self.home.name:
+            return self.home.name
+        return f"{self.__class__.__name__} {self.pk}"
 
     class Meta:
         db_table = 'interiorphotos'
@@ -251,18 +269,22 @@ class Basement(models.Model):
     def save(self, *args, **kwargs):
         if self.area and self.pricePerSqm:
             self.price = Decimal(self.area) * Decimal(self.pricePerSqm)
+
         super().save(*args, **kwargs)
 
-        if self.home:
-            self.home.save()
-
     def delete(self, *args, **kwargs):
-        home = self.home
+        home_id = self.home_id
         super().delete(*args, **kwargs)
 
-        if home:
+        if home_id:
             from .models import Basement
-            basements = Basement.objects.filter(home=home)
+            from decimal import Decimal
+
+            basements = Basement.objects.filter(home_id=home_id)
+
+            home = Home.objects.filter(pk=home_id).first()
+            if not home:
+                return
 
             if basements.exists():
                 total_price = sum(b.price or Decimal(0) for b in basements)
@@ -275,7 +297,7 @@ class Basement(models.Model):
                 home.totalprice = Decimal(0)
                 home.totalarea = Decimal(0)
 
-            home.save()
+            home.save(update_fields=["price", "totalprice", "totalarea"])
 
     def __str__(self):
         return str(self.id)

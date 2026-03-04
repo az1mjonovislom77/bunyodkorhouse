@@ -20,6 +20,7 @@ class MasterPlanInline(admin.TabularInline):
     model = MasterPlan
     extra = 1
 
+
 class BasementImageInline(admin.TabularInline):
     model = BasementImage
     extra = 1
@@ -79,12 +80,13 @@ class InProgressAdmin(TranslationAdmin):
     list_display = ('id', 'title', 'progress', 'stage')
     inlines = [InProgressImageInline, ]
 
+
 @admin.register(Home)
 class HomeAdmin(TranslationAdmin):
     list_display = ('id', 'name', 'area', 'price', 'totalarea', 'totalprice',
                     'buildingBlock', 'home_number', 'status', 'is_active')
     list_filter = ('region', 'floor', 'buildingBlock', 'status')
-    search_fields = ('name', 'region', 'description', 'floor', 'buildingBlock')
+    search_fields = ('name', 'region', 'description', 'floor', 'buildingBlock', 'id', 'home_number')
     inlines = [HomeImageInline, FloorPlanInline, MasterPlanInline,
                InteriorPhotosInline, DownPaymentInline]
 

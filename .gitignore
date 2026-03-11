@@ -7,7 +7,7 @@ venv/
 __pycache__/
 
 # Database
-
+*.sqlite3
 
 # Media and Static files
 media/

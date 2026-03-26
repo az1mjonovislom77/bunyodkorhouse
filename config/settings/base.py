@@ -32,7 +32,28 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = LOCAL_APPS + THIRD_PARTY_APPS
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://localhost:3004",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://professional-bunyodkor.vercel.app",
+    "https://backend.bunyodkorhouse.uz",
+    "https://crm.bunyodkorhouse.uz"
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://backend.bunyodkorhouse.uz",
+    "https://crm.bunyodkorhouse.uz",
+    "https://professional-bunyodkor.vercel.app",
+    "http://localhost:5173"
+    "http://localhost:5174"
+]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

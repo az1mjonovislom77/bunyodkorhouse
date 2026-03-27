@@ -44,14 +44,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
     "https://professional-bunyodkor.vercel.app",
     "https://backend.bunyodkorhouse.uz",
-    "https://crm.bunyodkorhouse.uz"
+    "https://crm.bunyodkorhouse.uz",
+    "https://bunyodkorhouse.uz"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://backend.bunyodkorhouse.uz",
     "https://crm.bunyodkorhouse.uz",
     "https://professional-bunyodkor.vercel.app",
-    "http://localhost:5173"
+    "https://bunyodkorhouse.uz",
+    "http://localhost:5173",
     "http://localhost:5174"
 ]
 

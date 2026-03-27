@@ -6,7 +6,8 @@ ALLOWED_HOSTS = [
     "backend.bunyodkorhouse.uz",
     "crm.bunyodkorhouse.uz",
     "professional-bunyodkor.vercel.app",
-    "https://bunyodkorhouse.uz"
+    "bunyodkorhouse.uz"
+    "api.bunyodkorhouse.uz",
     "localhost",
     "127.0.0.1",
 ]

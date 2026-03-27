@@ -46,7 +46,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://backend.bunyodkorhouse.uz",
     "https://crm.bunyodkorhouse.uz",
     "https://bunyodkorhouse.uz",
-    "https://api.bunyodkorhouse.uz",
+    "https://api.bunyodkorhouse.uz"
 ]
 
 CSRF_TRUSTED_ORIGINS = [

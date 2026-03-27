@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "backend.bunyodkorhouse.uz",
@@ -11,8 +11,6 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
 ]
-
-CORS_ALLOW_CREDENTIALS = True
 
 DATABASES = {
     'default': {

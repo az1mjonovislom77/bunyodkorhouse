@@ -80,7 +80,7 @@ class Reviews(models.Model):
 class WaitList(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.EmailField(null=True, blank=True)
-    phone_number = models.IntegerField()
+    phone_number = models.CharField()
     theme = models.CharField(max_length=100)
     message = models.TextField()
     date = models.DateTimeField(auto_now_add=True)

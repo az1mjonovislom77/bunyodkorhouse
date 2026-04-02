@@ -7,9 +7,9 @@ import json
 import os
 import aiohttp
 
-BOT_TOKEN = ""
-API_URL_ALL = "https://api.fayzlixonadonlar.uz/utils/waitlist/"
-API_URL_DAILY = "https://api.fayzlixonadonlar.uz/utils/daily_waitlist/"
+BOT_TOKEN = "8113972954:AAERkX9ofbA_2A1LXU_jhZdbXS_1G-EPAf4"
+API_URL_ALL = "https://api.bunyodkorhouse.uz/utils/waitlist/"
+API_URL_DAILY = "https://api.bunyodkorhouse.uz/utils/daily_waitlist/"
 USERS_FILE = "allowed_users.json"
 USER_IDS_FILE = "user_ids.json"
 
